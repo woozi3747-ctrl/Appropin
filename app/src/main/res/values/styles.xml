@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 휴대폰 다크 모드를 따라가요 (페이지도 다크 색으로 바뀜) -->
+    <style name="AppTheme" parent="@android:style/Theme.DeviceDefault.DayNight">
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:statusBarColor">#094828</item>
+        <item name="android:windowBackground">@color/page_bg</item>
+        <item name="android:navigationBarColor">@color/page_bg</item>
+    </style>
+</resources>

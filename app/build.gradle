@@ -1,0 +1,49 @@
+plugins {
+    id 'com.android.application'
+}
+
+// 서명 정보는 프로젝트 맨 위의 keystore.properties 에 있어요 (release.jks 와 함께 꼭 보관하세요)
+def keystoreProps = new Properties()
+def keystoreFile = rootProject.file('keystore.properties')
+if (keystoreFile.exists()) keystoreFile.withInputStream { keystoreProps.load(it) }
+
+android {
+    namespace 'com.jungcle.appropin'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId 'com.jungcle.appropin'
+        minSdk 29          // 안드로이드 10 이상
+        targetSdk 34
+        versionCode 1
+        versionName '1.0'
+    }
+
+    signingConfigs {
+        release {
+            if (keystoreProps['storeFile']) {
+                storeFile file(keystoreProps['storeFile'])
+                storePassword keystoreProps['storePassword']
+                keyAlias keystoreProps['keyAlias']
+                keyPassword keystoreProps['keyPassword']
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+// 결과 APK 이름: ApproPin-1.0.apk
+android.applicationVariants.all { variant ->
+    variant.outputs.all { outputFileName = "ApproPin-${variant.versionName}.apk" }
+}
