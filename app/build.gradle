@@ -2,10 +2,17 @@ plugins {
     id 'com.android.application'
 }
 
-// 서명 정보는 프로젝트 맨 위의 keystore.properties 에 있어요 (release.jks 와 함께 꼭 보관하세요)
+// 서명 정보는 키 파일을 저장소에 두지 않고 읽어요.
+//   · GitHub Actions: 저장소 Secrets(KEYSTORE_B64 / KEYSTORE_PASSWORD / KEY_ALIAS / KEY_PASSWORD)
+//   · 내 컴퓨터:      keystore.properties (이 파일과 키 파일은 .gitignore 로 커밋에서 빠져요)
 def keystoreProps = new Properties()
-def keystoreFile = rootProject.file('keystore.properties')
-if (keystoreFile.exists()) keystoreFile.withInputStream { keystoreProps.load(it) }
+def keystorePropsFile = rootProject.file('keystore.properties')
+if (keystorePropsFile.exists()) keystorePropsFile.withInputStream { keystoreProps.load(it) }
+
+def signingStoreFile = System.getenv('KEYSTORE_FILE') ?: keystoreProps['storeFile']
+def signingStorePassword = System.getenv('KEYSTORE_PASSWORD') ?: keystoreProps['storePassword']
+def signingKeyAlias = System.getenv('KEY_ALIAS') ?: keystoreProps['keyAlias']
+def signingKeyPassword = System.getenv('KEY_PASSWORD') ?: keystoreProps['keyPassword']
 
 android {
     namespace 'com.jungcle.appropin'
@@ -15,17 +22,17 @@ android {
         applicationId 'com.jungcle.appropin'
         minSdk 29          // 안드로이드 10 이상
         targetSdk 34
-        versionCode 2
-        versionName '1.1'
+        versionCode 3
+        versionName '1.2'
     }
 
     signingConfigs {
         release {
-            if (keystoreProps['storeFile']) {
-                storeFile file(keystoreProps['storeFile'])
-                storePassword keystoreProps['storePassword']
-                keyAlias keystoreProps['keyAlias']
-                keyPassword keystoreProps['keyPassword']
+            if (signingStoreFile) {
+                storeFile project.file(signingStoreFile)   // keystore.properties 기준: app/release.jks
+                storePassword signingStorePassword
+                keyAlias signingKeyAlias
+                keyPassword signingKeyPassword
             }
         }
     }
@@ -43,7 +50,7 @@ android {
     }
 }
 
-// 결과 APK 이름: ApproPin-1.0.apk
+// 결과 APK 이름: ApproPin-1.2.apk
 android.applicationVariants.all { variant ->
     variant.outputs.all { outputFileName = "ApproPin-${variant.versionName}.apk" }
 }

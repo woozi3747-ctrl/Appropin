@@ -4,3 +4,9 @@ app/build/
 local.properties
 .idea/
 *.iml
+
+# 서명 키는 저장소에 올리지 않아요 (GitHub Actions Secrets 에 보관)
+*.jks
+*.keystore
+*.p12
+keystore.properties
